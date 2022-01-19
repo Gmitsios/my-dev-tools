@@ -1,0 +1,4 @@
+discord.py
+mongoengine
+python-dotenv
+pika

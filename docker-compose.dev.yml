@@ -1,0 +1,10 @@
+version: '3'
+
+services:
+  sample:
+    volumes:
+      - ./:/app
+  
+  rabbit-consumer:
+    volumes:
+      - ./:/app

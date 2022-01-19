@@ -1,0 +1,9 @@
+FROM my-dev-tools:latest
+
+RUN pip3 install eth-brownie
+
+# Avalanche
+RUN brownie networks add "Ethereum" "Avalanche" host="https://api.avax.network/ext/bc/C/rpc" chainid=43114 explorer="https://snowtrace.io/"
+
+
+CMD [ "echo", "Brownie environment ready!"]

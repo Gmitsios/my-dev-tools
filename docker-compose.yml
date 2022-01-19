@@ -1,0 +1,51 @@
+version: '3'
+
+services:
+  sample:
+    image: my-dev-tools:latest
+    container_name: sample-bot
+    environment:
+      - APPNAME=sample-bot
+    network_mode: host
+    command: ["python", "sample/main.py"]
+    restart: unless-stopped
+    depends_on:
+      - mongo-db
+
+  mongo-db:
+    image: mongo
+    container_name: 'the-db-container'
+    environment:
+      - MONGO_INITDB_DATABASE=trade-db
+      - MONGO_INITDB_USERNAME=mtrader
+      - MONGO_INITDB_PASSWORD=financier
+    volumes:
+      - ${DB_PATH}/scripts/mongo-init.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+      # change this for every project!
+      - ${DB_PATH}/py_liquidator:/data/db
+    ports:
+      - '27017-27019:27017-27019'
+    restart: unless-stopped
+  
+  rabbit-server:
+    image: rabbitmq:3-management
+    ports:
+      - 5672:5672
+      - 15672:15672
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=passw0rd
+    volumes:
+      - ${DB_PATH}/rabbit-mq/0:/bitnami
+    restart: unless-stopped
+
+  rabbit-consumer:
+    image: my-dev-tools:latest
+    container_name: rabbitmq-consumer
+    environment:
+      - APPNAME=rabbit-consumer
+    network_mode: host
+    command: ["python", "rabbitmq_consumer.py"]
+    restart: unless-stopped
+    depends_on:
+      - rabbit-server
